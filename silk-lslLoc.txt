@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Silk>
+  <Prefixes>
+    <Prefix id="rdf" namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <Prefix id="rdfs" namespace="http://www.w3.org/2000/01/rdf-schema#"/>
+	<Prefix id="owl" namespace="http://www.w3.org/2002/07/owl#"/>
+    <Prefix id="dbpedia-owl" namespace="http://dbpedia.org/ontology/"/>
+	<Prefix id="geo" namespace="http://www.w3.org/2003/01/geo/wgs84_pos#"/>
+  </Prefixes>
+
+  <DataSources>
+  <DataSource id="dbpedia" type="sparqlEndpoint">
+      <Param name="endpointURI" value="http://dbpedia.org/sparql"/>
+   </DataSource>
+
+  <DataSource id="twits" type="file">
+	   <Param name="file" value="C:/Users/abc/rdfisedFile.rdf"/>
+	   <Param name="format" value="RDF/XML" />
+    </DataSource>
+  </DataSources>
+
+  <Interlinks>
+    <Interlink id="orgs">
+      <LinkType>owl:sameAs</LinkType>
+      
+      <SourceDataset dataSource="dbpedia" var="a">
+        <RestrictTo>
+         ?a rdf:type dbpedia-owl:Place.
+        </RestrictTo>
+      </SourceDataset>
+
+      <TargetDataset dataSource="twits" var="b">
+        <RestrictTo>
+          ?b rdf:type geo:SpatialThing
+        </RestrictTo>
+      </TargetDataset>
+
+      <LinkageRule>
+  		  <Compare metric="levenshtein" threshold="0.5">
+            <TransformInput function="lowerCase">
+              <Input path="?a/rdfs:label"/>
+            </TransformInput>
+            <TransformInput function="lowerCase">
+              <Input path="?b/rdfs:label"/>
+            </TransformInput>
+          </Compare>
+      </LinkageRule>
+	  <Filter limit="1"/>
+	  
+	  <Outputs>
+    <Output maxConfidence="0.75" type="file" >
+      <Param name="file" value="C:/Users/abc/verify_linksLoc.xml"/>
+      <Param name="format" value="alignment"/>
+    </Output>
+    <Output minConfidence="0.85" type="file">
+      <Param name="file" value="C:/Users/abc/accepted_linksLoc.xml"/>
+      <Param name="format" value="alignment"/>
+    </Output>
+  </Outputs>
+	  </Interlink>
+  </Interlinks>
+</Silk>
